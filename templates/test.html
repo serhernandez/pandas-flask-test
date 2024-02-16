@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<head>
+    <title>Average Budget for {{ lang }} Language Movies by Release Year</title>
+    <h1>Average Budget for {{ lang }} Language Movies by Release Year (from sample of 5000 movies from TMDb)</h1>
+</head>
+
+<body>
+    
+    <form method="POST">
+        <select name="language" id="language">
+            <option value="invalid" selected disabled>Select a language</option>
+            {% for sellang in langs %}
+                <option value="{{sellang}}">{{sellang}}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" id="submit" disabled>Submit</button>
+    </form>
+
+    <script>
+        const dropdown = document.getElementById('language');
+        const submit_button = document.getElementById('submit');
+        document.getElementById('language').addEventListener('change', () => {
+            if (dropdown.value === "invalid") {
+                submit_button.disabled = true;
+            } else {
+                submit_button.disabled = false;
+            }
+        });
+    </script>
+
+    <p></p>
+
+    <img src="{{ url }}" alt="Chart" height="900" width="1200">
+</body>
