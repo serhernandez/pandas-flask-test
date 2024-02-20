@@ -34,10 +34,6 @@ avg_crew=pd.NamedAgg('crew_count', 'mean'),
 avg_runtime=pd.NamedAgg('runtime', 'mean'),
 avg_revenue=pd.NamedAgg('revenue', 'mean')).sort_values(by=['original_language', 'release_year'])
 
-for lang in budget_info_prelim['original_language'].unique():
-    if len(budget_info_prelim[budget_info_prelim['original_language'] == lang]) == 1:
-        budget_info_prelim = budget_info_prelim.query(f'original_language != "{lang}"') #Dropping languages with only 1 year for the sake of graph readability
-
 budget_info_prelim['avg_budget'] = budget_info_prelim['avg_budget'] / 1000000
 budget_info_prelim['avg_revenue'] = budget_info_prelim['avg_revenue'] / 1000000
 
@@ -75,7 +71,7 @@ def graph():
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
     ax1.set_ylabel('Average Budget in USD (in Millions)', color=color_one)
-    ax1.plot(budget_info['release_year'], budget_info['avg_budget'], color=color_one, label="Average Budget")
+    ax1.plot(budget_info['release_year'], budget_info['avg_budget'], color=color_one, label="Average Budget", marker="o")
     ax1.set_xticklabels(labels=budget_info['release_year'],rotation=90)
 
     plt.grid(True)
@@ -83,7 +79,7 @@ def graph():
 
     ax2 = ax1.twinx()
     ax2.set_ylabel(secondaries[secondary][0], color=color_two)
-    ax2.plot(budget_info['release_year'], budget_info[secondaries[secondary][1]], color=color_two, label=secondaries[secondary][0])
+    ax2.plot(budget_info['release_year'], budget_info[secondaries[secondary][1]], color=color_two, label=secondaries[secondary][0], marker="X")
     
     fig.legend()
 
