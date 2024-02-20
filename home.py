@@ -39,8 +39,16 @@ for lang in budget_info['original_language'].unique():
         budget_info = budget_info.query(f'original_language != "{lang}"') #Dropping languages with only 1 year for the sake of graph readability
 
 budget_info['avg_budget'] = budget_info['avg_budget'] / 1000000
+budget_info['avg_revenue'] = budget_info['avg_revenue'] / 1000000
 
 langs = {Lang(lang).name:lang for lang in budget_info['original_language'].unique()}
+secondaries = {
+    'cast': ("Average # of Cast Members", "avg_cast"),
+    'credits': ("Average # of Credits", "avg_credits"),
+    'crew': ("Average # of Crew Members", "avg_crew"),
+    'revenue': ("Average Revenue in USD (in Millions)", "avg_revenue"),
+    'runtime': ("Average Runtime (in Minutes)", "avg_runtime")
+}
 
 app = Flask(__name__)
 
@@ -48,18 +56,20 @@ app = Flask(__name__)
 def graph():
     if request.method == "POST":
         lang = langs[request.form.get("language")]
+        secondary = request.form.get("secondary")
     else:
         lang = "en"
+        secondary = "credits"
 
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
-    ax1.set_ylabel('Average Budget in USD (in Millions', color="blue")
+    ax1.set_ylabel('Average Budget in USD (in Millions)', color="blue")
     ax1.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')['avg_budget'], color="blue", label="Average Budget")
     ax1.set_xticklabels(labels=budget_info.query(f'original_language == "{lang}"')['release_year'],rotation=90)
 
     ax2 = ax1.twinx()
-    ax2.set_ylabel("Average # of Credits", color="red")
-    ax2.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')['avg_credits'], color="red", label="Average # of Credits")
+    ax2.set_ylabel(secondaries[secondary][0], color="red")
+    ax2.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')[secondaries[secondary][1]], color="red", label=secondaries[secondary][0])
 
     plt.grid(True)
 
