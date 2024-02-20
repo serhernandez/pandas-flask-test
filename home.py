@@ -78,11 +78,12 @@ def graph():
     ax1.plot(budget_info['release_year'], budget_info['avg_budget'], color=color_one, label="Average Budget")
     ax1.set_xticklabels(labels=budget_info['release_year'],rotation=90)
 
+    plt.grid(True)
+    plt.margins(0)
+
     ax2 = ax1.twinx()
     ax2.set_ylabel(secondaries[secondary][0], color=color_two)
     ax2.plot(budget_info['release_year'], budget_info[secondaries[secondary][1]], color=color_two, label=secondaries[secondary][0])
-
-    plt.grid(True)
     
     fig.legend()
 
