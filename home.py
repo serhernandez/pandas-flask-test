@@ -64,7 +64,8 @@ def graph():
 
     if len(budget_info[budget_info['original_language'] == lang]) > 20:
         budget_info = budget_info[budget_info['original_language'] == lang]
-        budget_info = pd.concat([budget_info.head(1), budget_info.iloc[1:-1].sample(n=18), budget_info.tail(1)]).sort_values(by='release_year')
+        interp = list(map(lambda x: str(int(x)), np.linspace(int(budget_info.iloc[0]['release_year']), int(budget_info.iloc[-1]['release_year']), 20)))
+        budget_info = budget_info[budget_info.isin(interp).any(axis=1)].sort_values(by='release_year')
 
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
