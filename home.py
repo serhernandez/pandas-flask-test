@@ -2,6 +2,7 @@ from iso639 import Lang
 from flask import Flask, render_template, request
 
 import json
+import matplotlib.ticker
 
 import numpy as np
 import pandas as pd
@@ -68,11 +69,13 @@ def graph():
         budget_info = budget_info[budget_info.isin(interp).any(axis=1)].sort_values(by='release_year')
 
     plt.rcParams.update({'font.size': 15})
+    ticks = len(budget_info) - 2 if len(budget_info) > 3 else 3
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
     ax1.set_ylabel('Average Budget in USD (in Millions)', color=color_one)
     ax1.plot(budget_info['release_year'], budget_info['avg_budget'], color=color_one, label="Average Budget", marker="o")
     ax1.set_xticklabels(labels=budget_info['release_year'],rotation=90)
+    ax1.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(ticks))
 
     plt.grid(True)
     plt.margins(0)
@@ -80,7 +83,8 @@ def graph():
     ax2 = ax1.twinx()
     ax2.set_ylabel(secondaries[secondary][0], color=color_two)
     ax2.plot(budget_info['release_year'], budget_info[secondaries[secondary][1]], color=color_two, label=secondaries[secondary][0], marker="X")
-    
+    ax2.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(ticks))
+
     fig.legend()
 
     fig.set_size_inches(16, 12)
