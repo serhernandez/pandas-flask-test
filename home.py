@@ -67,6 +67,7 @@ def graph():
         interp = list(map(lambda x: str(int(x)), np.linspace(int(budget_info.iloc[0]['release_year']), int(budget_info.iloc[-1]['release_year']), 20)))
         budget_info = budget_info[budget_info.isin(interp).any(axis=1)].sort_values(by='release_year')
 
+    plt.rcParams.update({'font.size': 15})
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
     ax1.set_ylabel('Average Budget in USD (in Millions)', color="blue")
@@ -78,7 +79,7 @@ def graph():
     ax2.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')[secondaries[secondary][1]], color="red", label=secondaries[secondary][0])
 
     plt.grid(True)
-
+    
     fig.legend()
 
     fig.set_size_inches(16, 12)
