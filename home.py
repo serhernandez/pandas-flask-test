@@ -26,7 +26,13 @@ trimmed_df['cast_count'] = trimmed_df['cast'].apply(lambda x: len(json.loads(x))
 trimmed_df['credits_count'] = trimmed_df['crew_count'] + trimmed_df['cast_count']
 trimmed_df = trimmed_df.replace('cn', 'zh') #Replacing instances of cn with zh as cn is an invalid ISO639-1 code and should be zh or zh-cn
 
-budget_info = trimmed_df.groupby(['original_language', 'release_year'], as_index=False).agg(avg_budget=pd.NamedAgg('budget', 'mean'), avg_credits=pd.NamedAgg('credits_count', 'mean')).sort_values(by=['original_language', 'release_year'])
+budget_info = trimmed_df.groupby(['original_language', 'release_year'], as_index=False).agg(
+    avg_budget=pd.NamedAgg('budget', 'mean'), 
+    avg_credits=pd.NamedAgg('credits_count', 'mean'),
+    avg_cast=pd.NamedAgg('cast_count', 'mean'),
+    avg_crew=pd.NamedAgg('crew_count', 'mean'),
+    avg_runtime=pd.NamedAgg('runtime', 'mean'),
+    avg_revenue=pd.NamedAgg('revenue', 'mean')).sort_values(by=['original_language', 'release_year'])
 
 for lang in budget_info['original_language'].unique():
     if len(budget_info[budget_info['original_language'] == lang]) == 1:
