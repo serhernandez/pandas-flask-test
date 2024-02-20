@@ -13,6 +13,13 @@
                 <option value="{{sellang}}">{{sellang}}</option>
             {% endfor %}
         </select>
+        <select name="secondary" id="secondary">
+            <option value="credits" selected>Total Credits Count</option>
+            <option value="crew">Crew Count</option>
+            <option value="cast">Cast Count</option>
+            <option value="runtime">Runtime</option>
+            <option value="revenue">Revenue</option>
+        </select>
         <button type="submit" id="submit" disabled>Submit</button>
     </form>
 
