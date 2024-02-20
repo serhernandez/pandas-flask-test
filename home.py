@@ -11,31 +11,35 @@ plt.close("all")
 
 pd.options.display.float_format = '{:.0f}'.format
 
+movie_df = pd.read_csv('tmdb_5000_movies.csv')
+movie_df.dropna()
+credit_df = pd.read_csv('tmdb_5000_credits.csv')
+credit_df.dropna()
+
+combined_df = movie_df.merge(credit_df, how='inner', left_on='id', right_on='movie_id')
+trimmed_df = combined_df[combined_df['budget'] > 0].drop(['homepage', 'keywords', 'overview', 'tagline', 'movie_id', 'title_y'], axis=1).sort_values(by='budget', ascending=False)
+
+trimmed_df = trimmed_df.query('original_language != "xx"') #Ignoring xx as this is considered "no language"
+trimmed_df['release_year'] = trimmed_df['release_date'].apply(lambda x: x.split("-")[0])
+trimmed_df['crew_count'] = trimmed_df['crew'].apply(lambda x: len(json.loads(x)))
+trimmed_df['cast_count'] = trimmed_df['cast'].apply(lambda x: len(json.loads(x)))
+trimmed_df['credits_count'] = trimmed_df['crew_count'] + trimmed_df['cast_count']
+trimmed_df = trimmed_df.replace('cn', 'zh') #Replacing instances of cn with zh as cn is an invalid ISO639-1 code and should be zh or zh-cn
+
+budget_info = trimmed_df.groupby(['original_language', 'release_year'], as_index=False).agg(avg_budget=pd.NamedAgg('budget', 'mean'), avg_credits=pd.NamedAgg('credits_count', 'mean')).sort_values(by=['original_language', 'release_year'])
+
+for lang in budget_info['original_language'].unique():
+    if len(budget_info[budget_info['original_language'] == lang]) == 1:
+        budget_info = budget_info.query(f'original_language != "{lang}"') #Dropping languages with only 1 year for the sake of graph readability
+
+budget_info['avg_budget'] = budget_info['avg_budget'] / 1000000
+
+langs = {Lang(lang).name:lang for lang in budget_info['original_language'].unique()}
+
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
 def graph():
-    movie_df = pd.read_csv('tmdb_5000_movies.csv')
-    movie_df.dropna()
-    credit_df = pd.read_csv('tmdb_5000_credits.csv')
-    credit_df.dropna()
-
-    combined_df = movie_df.merge(credit_df, how='inner', left_on='id', right_on='movie_id')
-    trimmed_df = combined_df[combined_df['budget'] > 0].drop(['homepage', 'keywords', 'overview', 'tagline', 'movie_id', 'title_y'], axis=1).sort_values(by='budget', ascending=False)
-
-    trimmed_df = trimmed_df.query('original_language != "xx"') #Ignoring xx as this is considered "no language"
-    trimmed_df['release_year'] = trimmed_df['release_date'].apply(lambda x: x.split("-")[0])
-    trimmed_df['crew_count'] = trimmed_df['crew'].apply(lambda x: len(json.loads(x)))
-    trimmed_df['cast_count'] = trimmed_df['cast'].apply(lambda x: len(json.loads(x)))
-    trimmed_df['credits_count'] = trimmed_df['crew_count'] + trimmed_df['cast_count']
-    trimmed_df = trimmed_df.replace('cn', 'zh') #Replacing instances of cn with zh as cn is an invalid ISO639-1 code and should be zh or zh-cn
-
-    budget_info = trimmed_df.groupby(['original_language', 'release_year'], as_index=False).agg(avg_budget=pd.NamedAgg('budget', 'mean'), avg_credits=pd.NamedAgg('credits_count', 'mean')).sort_values(by=['original_language', 'release_year'])
-    
-    budget_info['avg_budget'] = budget_info['avg_budget'] / 1000000
-
-    langs = {Lang(lang).name:lang for lang in budget_info['original_language'].unique()}
-
     if request.method == "POST":
         lang = langs[request.form.get("language")]
     else:
