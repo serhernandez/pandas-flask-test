@@ -58,9 +58,13 @@ def graph():
     if request.method == "POST":
         lang = langs[request.form.get("language")]
         secondary = request.form.get("secondary")
+        color_one = request.form.get("color1")
+        color_two = request.form.get("color2")
     else:
         lang = "en"
         secondary = "credits"
+        color_one = "blue"
+        color_two = "red"
 
     if len(budget_info[budget_info['original_language'] == lang]) > 20:
         budget_info = budget_info[budget_info['original_language'] == lang]
@@ -70,13 +74,13 @@ def graph():
     plt.rcParams.update({'font.size': 15})
     fig, ax1 = plt.subplots()
     ax1.set_xlabel('Release Year')
-    ax1.set_ylabel('Average Budget in USD (in Millions)', color="blue")
-    ax1.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')['avg_budget'], color="blue", label="Average Budget")
+    ax1.set_ylabel('Average Budget in USD (in Millions)', color=color_one)
+    ax1.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')['avg_budget'], color=color_one, label="Average Budget")
     ax1.set_xticklabels(labels=budget_info.query(f'original_language == "{lang}"')['release_year'],rotation=90)
 
     ax2 = ax1.twinx()
-    ax2.set_ylabel(secondaries[secondary][0], color="red")
-    ax2.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')[secondaries[secondary][1]], color="red", label=secondaries[secondary][0])
+    ax2.set_ylabel(secondaries[secondary][0], color=color_two)
+    ax2.plot(budget_info.query(f'original_language == "{lang}"')['release_year'], budget_info.query(f'original_language == "{lang}"')[secondaries[secondary][1]], color=color_two, label=secondaries[secondary][0])
 
     plt.grid(True)
     
